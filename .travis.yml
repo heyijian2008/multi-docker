@@ -1,26 +1,28 @@
 sudo: required
+language: generic
+
 services:
   - docker
-  
+
 before_install:
   - docker build -t heyijian2008/react-test -f ./client/Dockerfile.dev ./client
-  
-scripts:
+
+script:
   - docker run -e CI=true heyijian2008/react-test npm test
-  
+
 after_success:
   - docker build -t heyijian2008/multi-client ./client
   - docker build -t heyijian2008/multi-nginx ./nginx
   - docker build -t heyijian2008/multi-server ./server
   - docker build -t heyijian2008/multi-worker ./worker
-  # log in to the docker CLI
+  # Log in to the docker CLI
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
-  # Take those images and push them to the docker hub
+  # Take those images and push them to docker hub
   - docker push heyijian2008/multi-client
   - docker push heyijian2008/multi-nginx
   - docker push heyijian2008/multi-server
   - docker push heyijian2008/multi-worker
-  
+
 deploy:
   provider: elasticbeanstalk
   region: 'ap-southeast-2'
